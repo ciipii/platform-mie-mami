@@ -43,9 +43,5 @@ Proyek ini bertujuan untuk membangun sebuah platform yang menghubungkan penjual 
 ```bash
   git clone https://github.com/ciipii/platform-mie-mami.git
   cd platform-mie-mami
-
-```bash
-git checkout backend
-
-```bash
-git checkout frontend
+  git checkout backend
+  git checkout frontend
