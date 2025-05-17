@@ -6,14 +6,14 @@ Platform Mie Mami adalah sebuah aplikasi lengkap yang terdiri dari **backend** d
 
 ## Deskripsi Proyek
 
-Proyek ini bertujuan untuk membangun sebuah platform yang menghubungkan penjual dan pembeli mie dengan fitur-fitur seperti katalog produk, pemesanan online, manajemen stok, serta sistem antrian pengiriman.
+Proyek ini bertujuan untuk membangun sebuah platform yang menghubungkan penjual dan pembeli mie dengan fitur-fitur seperti katalog produk, pemesanan online, dan manajemen stok.
 
 ---
 
 ## Struktur Proyek
 
 - **backend** — Berisi semua kode dan API server yang mengelola data, logika bisnis, dan komunikasi dengan database.  
-- **frontend** — Berisi antarmuka pengguna yang interaktif dan responsif menggunakan teknologi modern seperti React / Vue / Angular (sesuaikan dengan stack yang dipakai).  
+- **frontend** — Berisi antarmuka pengguna yang interaktif dan responsif menggunakan teknologi modern seperti React dan Filament.  
 
 ---
 
@@ -29,9 +29,9 @@ Proyek ini bertujuan untuk membangun sebuah platform yang menghubungkan penjual 
 
 ## Teknologi yang Digunakan
 
-- Backend: PHP / Node.js / Laravel / Express.js (sesuaikan)  
-- Frontend: React / Vue / Angular (sesuaikan)  
-- Database: MySQL / PostgreSQL / MongoDB (sesuaikan)  
+- Backend: Laravel
+- Frontend: React
+- Database: MySQL
 - Version Control: Git & GitHub  
 
 ---
