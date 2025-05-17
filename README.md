@@ -14,11 +14,10 @@ This frontend repository handles all user interface components, client-side rout
 
 ## Technologies Used
 
-- React (or React + TypeScript, Vue, Angular — sesuaikan dengan projectmu)
-- Vite (build tool)
-- CSS / SCSS / Tailwind CSS (sesuaikan)
-- Axios (for API requests)
-- ESLint / Prettier (code quality)
+- React (React + TypeScript)
+- Filament (build tool)
+- Tailwind CSS 
+- Postman (for API requests)
 
 ---
 
