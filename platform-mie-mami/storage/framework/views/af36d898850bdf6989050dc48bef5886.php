@@ -1,0 +1,1 @@
+<h1>Hello World</h1><?php /**PATH D:\mie-mami\mie-mami\resources\views/welcome.blade.php ENDPATH**/ ?>

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles can go here */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
