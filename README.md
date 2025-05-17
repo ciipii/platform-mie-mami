@@ -32,7 +32,7 @@ Proyek ini bertujuan untuk membangun sebuah platform yang menghubungkan penjual 
 - Backend: Laravel
 - Frontend: React
 - Database: MySQL
-- Version Control: Git & GitHub  
+- Version Control: GitHub  
 
 ---
 
