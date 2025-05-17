@@ -14,9 +14,9 @@ It supports seamless integration with the frontend and ensures robust, scalable 
 
 ## Technologies Used
 
-- PHP (or your backend language/framework, sesuaikan dengan stack kamu)  
+- Laravel (PHP) 
 - Composer (dependency management)  
-- MySQL / PostgreSQL / MongoDB (database, sesuaikan)  
+- MySQL (database)  
 - RESTful API design  
 - Middleware for authentication and security  
 
