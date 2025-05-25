@@ -1,6 +1,7 @@
 import Hero2 from '../components/Hero2';
 import FeaturedMenu from '../components/FeaturedMenu';
 import Footer from '../components/Footer';
+import restoImage from '../assets/resto.jpeg'
 
 function SinglePage() {
   return (
@@ -24,7 +25,7 @@ function SinglePage() {
             <div className="bg-gray-200 h-64 md:h-96 rounded-lg">
               {/* Placeholder for image */}
               <div className="w-full h-full flex items-center justify-center text-gray-500">
-                Restaurant Image
+                <img src={restoImage} alt="resto Image"/>
               </div>
             </div>
 

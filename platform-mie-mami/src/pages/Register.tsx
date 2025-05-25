@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser, RegisterData } from '../services/api';
+import axios from 'axios';
 
 function Register() {
   const navigate = useNavigate();
@@ -20,8 +21,7 @@ function Register() {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error for this field when user starts typing
+
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -33,62 +33,64 @@ function Register() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
       newErrors.email = 'Invalid email address';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-    
+
     if (formData.password !== formData.password_confirmation) {
       newErrors.password_confirmation = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     try {
       setLoading(true);
-      const response = await registerUser(formData);
+      await registerUser(formData); // ✅ Tidak perlu menyimpan response
       setSuccessMessage('Registration successful! Redirecting to login...');
-      
-      // Clear form
+
       setFormData({
         name: '',
         email: '',
         password: '',
         password_confirmation: ''
       });
-      
-      // Redirect to login after a delay
+
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-      
-    } catch (error: any) {
-      // Handle API validation errors
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors);
+    } catch (error: unknown) {
+      // ✅ Perbaikan typing
+      if (axios.isAxiosError(error) && error.response && error.response.data) {
+        const apiErrors = error.response.data.errors;
+        if (apiErrors) {
+          setErrors(apiErrors);
+        } else {
+          setErrors({ general: error.message });
+        }
       } else {
-        setErrors({ general: error.message || 'Registration failed. Please try again.' });
+        setErrors({ general: 'An unexpected error occurred.' });
       }
     } finally {
       setLoading(false);
@@ -96,24 +98,24 @@ function Register() {
   };
 
   return (
-    <div className="py-12">
+    <div className="pt-20 pb-12">
       <div className="max-w-md mx-auto px-4 sm:px-6">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-8">
             <h2 className="text-2xl font-bold text-center mb-6">Create an Account</h2>
-            
+
             {successMessage && (
               <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
                 {successMessage}
               </div>
             )}
-            
+
             {errors.general && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
                 {errors.general}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
@@ -131,7 +133,7 @@ function Register() {
                   <p className="mt-1 text-red-500 text-sm">{errors.name}</p>
                 )}
               </div>
-              
+
               <div className="mb-4">
                 <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
                   Email Address
@@ -148,7 +150,7 @@ function Register() {
                   <p className="mt-1 text-red-500 text-sm">{errors.email}</p>
                 )}
               </div>
-              
+
               <div className="mb-4">
                 <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
                   Password
@@ -165,7 +167,7 @@ function Register() {
                   <p className="mt-1 text-red-500 text-sm">{errors.password}</p>
                 )}
               </div>
-              
+
               <div className="mb-6">
                 <label htmlFor="password_confirmation" className="block text-gray-700 font-medium mb-2">
                   Confirm Password
@@ -182,7 +184,7 @@ function Register() {
                   <p className="mt-1 text-red-500 text-sm">{errors.password_confirmation}</p>
                 )}
               </div>
-              
+
               <button
                 type="submit"
                 disabled={loading}
@@ -196,7 +198,7 @@ function Register() {
                 ) : 'Register'}
               </button>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-gray-600">
                 Already have an account?{' '}

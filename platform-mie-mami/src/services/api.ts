@@ -1,3 +1,7 @@
+// importer
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
 // API base URL
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
@@ -39,6 +43,7 @@ export interface User {
 export interface AuthResponse {
   user: User;
   token?: string;
+  access_token?: string;
   message?: string;
 }
 
@@ -47,6 +52,12 @@ export interface ApiResponse<T> {
   message?: string;
   status?: string;
 }
+
+export interface LoginData {
+  email : string;
+  password : string;
+}
+
 
 // API functions
 export const fetchProducts = async (): Promise<Product[]> => {
@@ -113,3 +124,14 @@ export const registerUser = async (userData: RegisterData): Promise<AuthResponse
     throw error;
   }
 };
+
+// API For Login function
+export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
+  try {
+    const response = await axios.post('/login', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error logging in user:', error);
+    throw error;
+  }
+}

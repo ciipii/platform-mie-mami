@@ -1,14 +1,45 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 import logo from '../assets/logo.svg';
 
 function Navbar() {
+  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
+  const { getTotalItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    delete axios.defaults.headers.common['Authorization'];
+    setIsProfileDropdownOpen(false);
+    navigate('/');
+  };
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (isProfileDropdownOpen && !target.closest('.profile-dropdown')) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileDropdownOpen]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -91,15 +122,90 @@ function Navbar() {
             </div>
           </div>
 
-          {/* Login Button - Right */}
-          <div className="hidden md:block">
-            <Link to="/login" className="bg-[#441E1B] hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
-              <span>Login</span>
+          {/* Cart Icon and Login/Profile Section - Desktop */}
+          <div className="hidden md:flex md:items-center md:space-x-4">
+            {/* Cart Icon */}
+            <Link
+              to="/cart"
+              className="relative p-2 text-gray-700 hover:text-[#441E1B] transition-colors rounded-md hover:bg-gray-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6" />
+              </svg>
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-[16px] text-[10px] font-medium">
+                  {getTotalItems() > 99 ? '99+' : getTotalItems()}
+                </span>
+              )}
             </Link>
+
+            {/* Login/Profile Button */}
+            {isLoggedIn ? (
+              <div className="relative profile-dropdown">
+                <button
+                  onClick={toggleProfileDropdown}
+                  className="bg-[#441E1B] hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Profile</span>
+                  <svg className={`w-4 h-4 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Profile Dropdown */}
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      My Orders
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="bg-[#441E1B] hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
+                <span>Login</span>
+              </Link>
+            )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile cart icon and menu button */}
+          <div className="md:hidden flex items-center space-x-3">
+            {/* Mobile Cart Icon */}
+            <Link
+              to="/cart"
+              className="relative p-2 text-gray-700 hover:text-[#441E1B] transition-colors rounded-md hover:bg-gray-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6" />
+              </svg>
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-[16px] text-[10px] font-medium">
+                  {getTotalItems() > 99 ? '99+' : getTotalItems()}
+                </span>
+              )}
+            </Link>
+
+            {/* Mobile menu button */}
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
@@ -151,9 +257,49 @@ function Navbar() {
             >
               Contact
             </button>
-            <Link to="/login" className="w-full text-left bg-[#441E1B] hover:bg-indigo-700 text-white block px-3 py-2 rounded-md text-base font-medium mt-1">
-              Login
+
+            {/* Mobile Cart Link */}
+            <Link
+              to="/cart"
+              className="text-[#441E1B] hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center justify-between"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <span>Cart</span>
+              {getTotalItems() > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-[16px] text-[10px] font-medium">
+                  {getTotalItems() > 99 ? '99+' : getTotalItems()}
+                </span>
+              )}
             </Link>
+
+            {isLoggedIn ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="text-[#441E1B] hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/orders"
+                  className="text-[#441E1B] hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My Orders
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left bg-red-600 hover:bg-red-700 text-white block px-3 py-2 rounded-md text-base font-medium mt-1"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="w-full text-left bg-[#441E1B] hover:bg-indigo-700 text-white block px-3 py-2 rounded-md text-base font-medium mt-1">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       )}

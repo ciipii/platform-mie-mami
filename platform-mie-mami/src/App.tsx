@@ -6,6 +6,9 @@ import NotFound from './pages/NotFound'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ProductDetail from './pages/ProductDetail'
+import Dashboard from './pages/Dashboard'
+import Cart from './pages/Cart'
+import Orders from './pages/Orders'
 
 // Import components
 import Navbar from './components/Navbar'
@@ -19,6 +22,9 @@ function App() {
           <Route path="/" element={<SinglePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
