@@ -20,6 +20,13 @@ function Cart() {
     notes: ''
   });
 
+  // Debug info
+  console.log('Cart Debug Info:', {
+    isLoggedIn,
+    cartItemsLength: cartItems.length,
+    cartItems: cartItems
+  });
+
   // Redirect to login if not authenticated
   if (!isLoggedIn) {
     return (
@@ -28,6 +35,11 @@ function Cart() {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Please Login</h1>
             <p className="text-gray-600 mb-6">You need to be logged in to view your cart.</p>
+            <div className="bg-yellow-100 p-4 rounded-md mb-4">
+              <p className="text-sm text-yellow-800">
+                Debug: isLoggedIn = {isLoggedIn.toString()}
+              </p>
+            </div>
             <Link
               to="/login"
               className="bg-[#441E1B] hover:bg-[#5a2826] text-white px-6 py-3 rounded-md transition-colors"
@@ -49,33 +61,48 @@ function Cart() {
   };
 
   const handleCheckout = async () => {
+    console.log('🔥 CHECKOUT CLICKED!');
+    console.log('Customer Info:', customerInfo);
+    console.log('Payment Method:', paymentMethod);
+
     if (!customerInfo.name || !customerInfo.phone) {
+      console.log('❌ Validation failed - missing name or phone');
       alert('Please fill in your name and phone number');
       return;
     }
 
+    console.log('✅ Validation passed, starting checkout...');
     setIsCheckingOut(true);
+
     try {
+      console.log('📦 Calling placeOrder...');
       const orderId = await placeOrder(customerInfo, paymentMethod);
+      console.log('✅ Order placed successfully, ID:', orderId);
       setCurrentOrderId(orderId);
 
       if (paymentMethod === 'qris') {
+        console.log('💳 QRIS payment selected, showing payment modal...');
         setShowCheckoutForm(false);
         setShowQRISPayment(true);
+        console.log('🎯 QRIS modal should be visible now');
       } else {
+        console.log('💰 Non-QRIS payment, redirecting to orders...');
         alert(`Order placed successfully! Order ID: ${orderId}`);
         navigate('/orders');
       }
     } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      console.error('❌ Error placing order:', error);
+      alert(`Failed to place order: ${error.message || 'Unknown error'}`);
     } finally {
+      console.log('🏁 Checkout process finished');
       setIsCheckingOut(false);
     }
   };
 
   const handlePaymentSuccess = () => {
+    console.log('🎉 Payment successful! Order ID:', currentOrderId);
     updateOrderPaymentStatus(currentOrderId, 'paid');
+    clearCart(); // Clear cart after successful payment
     setShowQRISPayment(false);
     alert('Payment successful! Your order has been confirmed.');
     navigate('/orders');
@@ -98,6 +125,15 @@ function Cart() {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
             <p className="text-gray-600 mb-6">Add some delicious items to your cart to get started!</p>
+
+            {/* Debug Info */}
+            <div className="bg-blue-100 p-4 rounded-md mb-4 text-left max-w-md mx-auto">
+              <h3 className="font-semibold text-blue-900 mb-2">Debug Info:</h3>
+              <p className="text-sm text-blue-800">isLoggedIn: {isLoggedIn.toString()}</p>
+              <p className="text-sm text-blue-800">cartItems.length: {cartItems.length}</p>
+              <p className="text-sm text-blue-800">localStorage cart: {localStorage.getItem('cart') || 'null'}</p>
+            </div>
+
             <Link
               to="/"
               className="bg-[#441E1B] hover:bg-[#5a2826] text-white px-6 py-3 rounded-md transition-colors"
@@ -115,12 +151,64 @@ function Cart() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Your Cart</h1>
-          <button
-            onClick={clearCart}
-            className="text-red-600 hover:text-red-800 text-sm font-medium"
-          >
-            Clear Cart
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={clearCart}
+              className="text-red-600 hover:text-red-800 text-sm font-medium"
+            >
+              Clear Cart
+            </button>
+          </div>
+        </div>
+
+        {/* Debug Info Panel */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+          <h3 className="font-semibold text-yellow-900 mb-2">🔧 Debug Info:</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+            <div>
+              <p className="text-yellow-800">isLoggedIn: <span className="font-mono">{isLoggedIn.toString()}</span></p>
+              <p className="text-yellow-800">cartItems.length: <span className="font-mono">{cartItems.length}</span></p>
+              <p className="text-yellow-800">showCheckoutForm: <span className="font-mono">{showCheckoutForm.toString()}</span></p>
+            </div>
+            <div>
+              <p className="text-yellow-800">showQRISPayment: <span className="font-mono">{showQRISPayment.toString()}</span></p>
+              <p className="text-yellow-800">paymentMethod: <span className="font-mono">{paymentMethod}</span></p>
+              <p className="text-yellow-800">isCheckingOut: <span className="font-mono">{isCheckingOut.toString()}</span></p>
+            </div>
+          </div>
+
+          {/* Test Buttons */}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => {
+                console.log('🧪 Test: Opening checkout form');
+                setShowCheckoutForm(true);
+              }}
+              className="px-3 py-1 bg-blue-500 text-white text-xs rounded"
+            >
+              Test: Open Form
+            </button>
+            <button
+              onClick={() => {
+                console.log('🧪 Test: Opening QRIS payment');
+                setCurrentOrderId('TEST-123');
+                setShowQRISPayment(true);
+              }}
+              className="px-3 py-1 bg-green-500 text-white text-xs rounded"
+            >
+              Test: Open QRIS
+            </button>
+            <button
+              onClick={() => {
+                console.log('🧪 Test: Resetting all modals');
+                setShowCheckoutForm(false);
+                setShowQRISPayment(false);
+              }}
+              className="px-3 py-1 bg-red-500 text-white text-xs rounded"
+            >
+              Test: Reset
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -198,7 +286,11 @@ function Cart() {
                 Continue Shopping
               </Link>
               <button
-                onClick={() => setShowCheckoutForm(true)}
+                onClick={() => {
+                  console.log('🛒 Checkout button clicked!');
+                  setShowCheckoutForm(true);
+                  console.log('📋 Checkout form should be visible now');
+                }}
                 className="flex-1 bg-[#441E1B] hover:bg-[#5a2826] text-white py-3 px-4 rounded-md transition-colors"
               >
                 Checkout

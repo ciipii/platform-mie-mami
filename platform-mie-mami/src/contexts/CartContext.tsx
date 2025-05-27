@@ -147,11 +147,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const placeOrder = async (customerInfo: { name: string; phone: string; address?: string; notes?: string }, paymentMethod: 'qris' | 'cash' | 'transfer' = 'qris'): Promise<string> => {
+    console.log('🏪 PlaceOrder called with:', { customerInfo, paymentMethod, cartItemsLength: cartItems.length });
+
     if (cartItems.length === 0) {
+      console.log('❌ Cart is empty, throwing error');
       throw new Error('Cart is empty');
     }
 
     const orderId = `ORDER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log('🆔 Generated order ID:', orderId);
 
     const newOrder: Order = {
       id: orderId,
@@ -167,9 +171,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       notes: customerInfo.notes
     };
 
+    console.log('📋 Created order object:', newOrder);
     setOrders(prevOrders => [newOrder, ...prevOrders]);
-    clearCart();
 
+    // Only clear cart for cash payments (immediate completion)
+    // For QRIS and transfer, keep cart until payment is confirmed
+    if (paymentMethod === 'cash') {
+      console.log('💰 Cash payment - clearing cart immediately');
+      clearCart();
+    } else {
+      console.log('💳 Digital payment - keeping cart until payment confirmation');
+    }
+
+    console.log('✅ Order placed successfully, returning ID:', orderId);
     return orderId;
   };
 
